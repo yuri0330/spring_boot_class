@@ -1,0 +1,99 @@
+<!DOCTYPE html xmlns:th="http://www.thymeleaf.org">
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>board page</title>
+    <style type="text/css">
+        div.lineA {
+            height: 100px;
+            border: 1px solid gray;
+            float: left;
+            position: relative;
+            left: 120px;
+            margin: 5px;
+            padding: 5px;
+        }
+        div#banner {
+            width: 500px;
+            padding: 0;
+        }
+        div#banner img {
+            width: 450px;
+            height: 80px;
+            padding: 0;
+            margin-top: 10px;
+        }
+        div#loginBox {
+            width: 280px;
+            font-size: 10pt;
+            text-align: left;
+            padding-left: 20px;
+        }
+        div#loginBox button {
+            width: 250px;
+            height: 35px;
+            background-color: navy;
+            color: white;
+            margin-top: 10px;
+            margin-bottom: 15px;
+            font-size: 14pt;
+            font-weight: bold;
+        }
+        table#toplist td, table#newnotice td {
+            text-align: center;
+        }
+    </style>
+    <script type="text/javascript" src="/js/jquery-3.7.1.min.js"></script>
+    <script type="text/javascript">
+        $(function(){
+            //조회수 많은 인기 게시글 상위 3개 조회 출력 처리
+            $.ajax({
+                url: "boards/btop3",
+                type: "GET",
+                dataType: "json",
+                contentType:"application/json; charset=UTF-8",
+                success: function(data){
+                    console.log("success : " + data);
+
+                    //object --> string
+                    var str = JSON.stringify(data);
+
+                    //string --> json
+                    var json = JSON.parse(str);
+
+                    values = "";
+                    for(var i in json.list){
+                        //로그인한 회원만 게시글 상세보기를 할 수 있게 한다면
+                        <c:if test="${ !empty sessionScope.loginMember }">
+                            values += "<tr><td>" + json.list[i].bnum
+                            + "</td><td><a href='boards/"+ json.list[i].bnum + "'>"
+                            + decodeURIComponent(json.list[i].btitle).replace(/\+/gi, " ")
+                            + "</a></td><td>"
+                            + json.list[i].rcount + "</td></tr>";
+                        </c:if>
+                        <c:if test="${ empty sessionScope.loginMember }">
+                            values += "<tr><td>" + json.list[i].bnum
+                            + "</td><td>"
+                            + decodeURIComponent(json.list[i].btitle).replace(/\+/gi, " ")
+                            + "</td><td>"
+                            + json.list[i].rcount + "</td></tr>";
+                        </c:if>
+                    }
+
+                    $('#toplist').html($('#toplist').html() + values);
+                    //$('#toplist').append(values);
+                },
+                error: function(jqXHR, textStatus, errorThrown){
+                    console.log("error : " + jqXHR + ", " + textStatus + ", " + errorThrown);
+                }
+            });  //ajax
+
+        }); //document.ready
+    </script>
+</head>
+<body>
+<h1>board service page : jps 방번째 방법</h1>
+<hr>
+
+</body>
+</html>
